@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, model } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  signal,
+  output,
+} from '@angular/core';
 import { ArticleSortOptions } from '../types';
 
 @Component({
@@ -8,14 +13,14 @@ import { ArticleSortOptions } from '../types';
   template: ` <div class="join">
     <button
       [disabled]="sortOption() === 'oldestFirst'"
-      (click)="sortOption.set('oldestFirst')"
+      (click)="changeSortOrder('oldestFirst')"
       class="btn join-item"
     >
       Oldest First
     </button>
     <button
       [disabled]="sortOption() === 'newestFirst'"
-      (click)="sortOption.set('newestFirst')"
+      (click)="changeSortOrder('newestFirst')"
       class="btn join-item"
     >
       Newest First
@@ -24,5 +29,11 @@ import { ArticleSortOptions } from '../types';
   styles: ``,
 })
 export class ListSortPrefs {
-  sortOption = model<ArticleSortOptions>('oldestFirst'); // both an input and output [()] from the parent to "share" a signal.
+  sortOption = signal<ArticleSortOptions>('oldestFirst');
+  sortChanged = output<ArticleSortOptions>();
+
+  changeSortOrder(by: ArticleSortOptions) {
+    this.sortOption.set(by);
+    this.sortChanged.emit(by); // send  a message to the parent component that this happened.
+  }
 }
